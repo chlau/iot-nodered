@@ -13,6 +13,13 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+/* edited on 6 Jan 2017
+* by Cliff Lau
+* code added to allow for accepting override of the Identifiers 
+* by setting a CSV variable called msg.identifiers
+*/
+
 var RED = require(process.env.NODE_RED_HOME + "/red/red");
 
 var request = require('request');
@@ -120,7 +127,15 @@ function IBMPushNode(n) {
 	this.mode = n.mode;
 
 	this.on("input", function(msg) {
+		//first pref to the mode sent from the message
+		this.mode = msg.mode || this.mode;
 
+		console.log("The mode is "+this.mode);
+		//first pref to identifiers sent from the message
+		this.identifiers = msg.identifiers || this.identifiers ;
+
+		console.log("Identifiers are: "+this.identifiers);
+		
 		var alert = msg.payload;
 		alert = alert.toString();
 
@@ -138,10 +153,7 @@ function IBMPushNode(n) {
 				target : {}
 		};
 
-		//first pref to the mode sent from the message
-		this.mode = msg.mode || this.mode;
 
-		console.log("The mode is "+this.mode);
 
 		switch (this.notificationType) {
 			case "broadcast":
